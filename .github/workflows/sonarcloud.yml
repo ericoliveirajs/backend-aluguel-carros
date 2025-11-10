@@ -1,0 +1,37 @@
+# Este workflow vai rodar o SonarCloud em todo Pull Request para a 'develop'
+name: SonarCloud CI
+
+on:
+  push:
+    branches:
+      - develop # Roda no merge para a develop
+  pull_request:
+    branches:
+      - develop # Roda em todo PR para a develop
+
+jobs:
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Necessário para o Sonar analisar o histórico
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests and coverage
+        run: npm run test -- --coverage # Roda os testes e GERA o relatório de cobertura
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # O token que acabamos de salvar
+        with:
+          # Passa os argumentos para o Sonar Scanner
+          args: >
+            -Dsonar.organization=ericoliveirajs
+            -Dsonar.projectKey=ericoliveirajs_backend-aluguel-carros
+            -Dsonar.sources=src
+            -Dsonar.tests=src
+            -Dsonar.test.inclusions=**/*.spec.ts
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info

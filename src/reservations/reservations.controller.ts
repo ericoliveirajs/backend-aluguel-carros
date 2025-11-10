@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req, Get } from '@nestjs/common';
+import { Controller, Post, Body, Req, Get, Delete } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import type { Request } from 'express';
@@ -16,10 +16,15 @@ export class ReservationsController {
 
     return this.reservationsService.create(createReservationDto, userId);
   }
-    @Get('me')
-      findMyReservation(@Req() req: Request) {
-        const userId = (req.user as any)._id;
+  @Get('me')
+  findMyReservation(@Req() req: Request) {
+    const userId = (req.user as any)._id;
 
-        return this.reservationsService.findForUser(userId);
-      }
+    return this.reservationsService.findForUser(userId);
+  }
+  @Delete('me')
+  cancelMyReservation(@Req() req: Request) {
+    const userId = (req.user as any) ._id;
+    return this.reservationsService.cancelForUser(userId);
+  }
 }

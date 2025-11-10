@@ -65,4 +65,21 @@ export class ReservationsService {
       .populate('vehicleId')
       .exec();
   }
+
+  async  cancelForUser (userId: string ) {
+    const reservation = await  this.reservationModel
+    .findOne ({userId: new Types.ObjectId(userId) })
+    .exec();
+
+    if (!reservation) {
+      throw new NotFoundException('Você não possui uma reserva ativa para cancelar.')
+    }
+
+    await this.vehiclesService.updateStatus(
+      reservation.vehicleId.toString(),
+      VehicleStatus.DISPONIVEL,
+    );
+
+    return this.reservationModel.deleteOne({ _id: reservation._id});
+  }
 }

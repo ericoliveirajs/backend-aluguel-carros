@@ -16,4 +16,10 @@ export class ReservationsController {
 
     return this.reservationsService.create(createReservationDto, userId);
   }
+    @Get('me')
+      findMyReservation(@Req() req: Request) {
+        const userId = (req.user as any)._id;
+
+        return this.reservationsService.findForUser(userId);
+      }
 }

@@ -59,4 +59,10 @@ export class ReservationsService {
 
     return createdReservation.save();
   }
+  async findForUser(userId: string): Promise<ReservationDocument | null> {
+    return this.reservationModel
+      .findOne({ userId: new Types.ObjectId(userId) })
+      .populate('vehicleId')
+      .exec();
+  }
 }

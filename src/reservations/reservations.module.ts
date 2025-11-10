@@ -17,5 +17,6 @@ import { VehiclesModule } from '../vehicles/vehicles.module';
   ],
   controllers: [ReservationsController],
   providers: [ReservationsService],
+  exports:  [ReservationsService],
 })
 export class ReservationsModule {}

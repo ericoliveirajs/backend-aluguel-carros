@@ -14,4 +14,8 @@ export class VehiclesService {
     const createdVehicle = new this.vehicleModel(createVehicleDto);
     return createdVehicle.save();
   }
+
+  async findAll(): Promise<VehicleDocument[]> {
+    return this.vehicleModel.find().exec();
+  }
 }

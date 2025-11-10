@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Put, Param, Body, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Req, Put, Param, Body, ForbiddenException, NotFoundException, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiTags } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -35,6 +35,29 @@ export class UsersController {
     }
 
     const { password, ...result } = updatedUser.toObject();
+    return result;
+  }
+
+  @Delete(':id')
+  async remove(
+    @Param('id') id: string,
+    @Req() req: Request,
+  ) {
+    const loggedInUserId = (req.user as any)._id;
+
+    if (loggedInUserId.toString() !== id) {
+      throw new ForbiddenException(
+        'Você não tem permissão para deletar este usuário.',
+      );
+    }
+
+    const deletedUser = await this.usersService.remove(id);
+
+    if (!deletedUser) {
+      throw new NotFoundException('Usuário não encontrado para deleção.');
+    }
+
+    const { password, ...result } = deletedUser.toObject();
     return result;
   }
 }

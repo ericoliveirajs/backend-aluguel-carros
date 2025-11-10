@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # 1. O serviço da nossa API
+  api:
+    build: .
+    container_name: aluguel-carros-api
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_URI: mongodb://mongo_db:27017/aluguelCarrosDB
+      JWT_SECRET: SEU_SEGREDO_SUPER_SEGURO_PARA_O_TOKEN_123456
+    depends_on:
+      - mongo_db
+
+  # 2. O serviço do Banco de Dados
+  # (Note que 'mongo_db:' está no mesmo nível de 'api:')
+  mongo_db:
+    image: mongo
+    container_name: mongo-aluguel-carros
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

@@ -18,4 +18,17 @@ export class VehiclesService {
   async findAll(): Promise<VehicleDocument[]> {
     return this.vehicleModel.find().exec();
   }
+
+  async findById(id: string): Promise<VehicleDocument | null> {
+    return this.vehicleModel.findById(id).exec();
+  }
+
+  async updateStatus(
+    id: string,
+    status: string,
+  ): Promise<VehicleDocument | null> {
+    return this.vehicleModel
+      .findByIdAndUpdate(id, { status: status }, { new: true })
+      .exec();
+  }
 }

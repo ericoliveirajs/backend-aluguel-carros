@@ -1,26 +1,62 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import {
+  Reservation,
+  ReservationDocument,
+} from './schemas/reservation.schema';
 import { CreateReservationDto } from './dto/create-reservation.dto';
-import { UpdateReservationDto } from './dto/update-reservation.dto';
+import { VehiclesService } from '../vehicles/vehicles.service';
+import { VehicleStatus } from '../vehicles/schemas/vehicle.schema';
 
 @Injectable()
 export class ReservationsService {
-  create(createReservationDto: CreateReservationDto) {
-    return 'This action adds a new reservation';
-  }
+  constructor(
+    @InjectModel(Reservation.name)
+    private reservationModel: Model<ReservationDocument>,
+    private vehiclesService: VehiclesService,
+  ) {}
 
-  findAll() {
-    return `This action returns all reservations`;
-  }
+  async create(
+    createReservationDto: CreateReservationDto,
+    userId: string,
+  ) {
+    const { vehicleId } = createReservationDto;
 
-  findOne(id: number) {
-    return `This action returns a #${id} reservation`;
-  }
+    const existingReservationForUser = await this.reservationModel
+      .findOne({ userId: new Types.ObjectId(userId) })
+      .exec();
 
-  update(id: number, updateReservationDto: UpdateReservationDto) {
-    return `This action updates a #${id} reservation`;
-  }
+    if (existingReservationForUser) {
+      throw new ConflictException(
+        'Você já possui uma reserva ativa. Não é possível reservar mais de um veículo.',
+      );
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} reservation`;
+    const vehicle = await this.vehiclesService.findById(vehicleId);
+
+    if (!vehicle) {
+      throw new NotFoundException('O veículo solicitado não foi encontrado.');
+    }
+
+    if (vehicle.status === VehicleStatus.RESERVADO) {
+      throw new ConflictException('Este veículo já está reservado.');
+    }
+
+    await this.vehiclesService.updateStatus(
+      vehicleId,
+      VehicleStatus.RESERVADO,
+    );
+
+    const createdReservation = new this.reservationModel({
+      userId: new Types.ObjectId(userId),
+      vehicleId: new Types.ObjectId(vehicleId),
+    });
+
+    return createdReservation.save();
   }
 }

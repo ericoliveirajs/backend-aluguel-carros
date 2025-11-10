@@ -1,34 +1,63 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Req, Put, Param, Body, ForbiddenException, NotFoundException, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { ApiTags } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto';
+import type { Request } from 'express';
 
+@ApiTags('2. Usuários')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Get('me')
+  getProfile(@Req() req) {
+    return req.user;
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: Request,
+  ) {
+    const loggedInUserId = (req.user as any)._id;
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
+    if (loggedInUserId.toString() !== id) {
+      throw new ForbiddenException(
+        'Você não tem permissão para editar este usuário.',
+      );
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    const updatedUser = await this.usersService.update(id, updateUserDto);
+
+    if (!updatedUser) {
+      throw new NotFoundException('Usuário não encontrado para atualização.');
+    }
+
+    const { password, ...result } = updatedUser.toObject();
+    return result;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(
+    @Param('id') id: string,
+    @Req() req: Request,
+  ) {
+    const loggedInUserId = (req.user as any)._id;
+
+    if (loggedInUserId.toString() !== id) {
+      throw new ForbiddenException(
+        'Você não tem permissão para deletar este usuário.',
+      );
+    }
+
+    const deletedUser = await this.usersService.remove(id);
+
+    if (!deletedUser) {
+      throw new NotFoundException('Usuário não encontrado para deleção.');
+    }
+
+    const { password, ...result } = deletedUser.toObject();
+    return result;
   }
 }

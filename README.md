@@ -1,98 +1,111 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+<div align="center">
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# 🚗 Guardians API — Sistema de Aluguel de Carros  
+**Teste Técnico Happmobi**
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+API Restful completa desenvolvida com **Nest.js**, **TypeScript** e **MongoDB**, voltada ao gerenciamento de reservas de veículos.  
+100% funcional, testada, monitorada e implantada em nuvem ☁️
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)](#)
+[![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](#)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](#)
+[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](#)
+[![Jest](https://img.shields.io/badge/Tests-96%25-brightgreen?style=for-the-badge&logo=jest&logoColor=white)](#)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#)
+[![Railway](https://img.shields.io/badge/Deploy-Railway-000000?style=for-the-badge&logo=railway&logoColor=white)](#)
+[![Sentry](https://img.shields.io/badge/Monitoring-Sentry-362D59?style=for-the-badge&logo=sentry&logoColor=white)](#)
 
-## Project setup
+---
+
+</div>
+
+## 🌐 Links do Deploy
+
+🔹 **API (Railway):** [backend-aluguel-carros-production.up.railway.app](http://backend-aluguel-carros-production.up.railway.app)  
+🔹 **Swagger (Documentação):** [backend-aluguel-carros-production.up.railway.app/api](http://backend-aluguel-carros-production.up.railway.app/api)
+
+---
+
+## ✨ Features e Diferenciais
+
+> Projeto desenvolvido com foco em **boas práticas**, **segurança**, **testabilidade** e **observabilidade**.
+
+### ⚙️ Funcionalidades Principais
+
+- 🔑 **Autenticação JWT:** `Cadastro` e `Login` seguros via token.
+- 🚘 **Gerenciamento de Veículos:** CRUD completo (`/vehicles`).
+- 📅 **Reservas de Veículos:** Criar e cancelar reservas (`/reservations`).
+- 🧩 **Regras de Negócio Críticas:**
+  - Usuário não pode reservar mais de um veículo (**409 Conflict**)
+  - Veículo já reservado não pode ser reservado novamente (**409 Conflict**)
+  - Veículo reservado não pode ser deletado (**409 Conflict**)
+  - Ao deletar o usuário, sua reserva é automaticamente removida (**deleção em cascata**)
+
+---
+
+## 🧠 Diferenciais Técnicos (DevSecOps)
+
+### 🔐 Segurança (RBAC - Roles Guard)
+- Rotas administrativas (`POST`, `PATCH`, `DELETE` em `/vehicles`) protegidas e acessíveis apenas por usuários **admin**.
+- Rotas públicas (`GET /vehicles`) disponíveis a todos os usuários autenticados.
+
+### 🧪 Testes Unitários (Jest)
+- Cobertura de **+96%** nas lógicas críticas (`AuthService` e `ReservationsService`).
+- Testes em **controllers** e **services** asseguram compilação e injeção de dependências corretas.
+
+### 📊 Monitoramento (Sentry)
+- Totalmente instrumentada com **Sentry.io**.
+- Qualquer erro não tratado (500) é automaticamente reportado no painel de monitoramento.
+
+### 📘 Documentação (Swagger)
+- API 100% documentada e hospedada publicamente em `/api`.
+
+### 🐳 Deploy (Docker & PaaS)
+- Aplicação **containerizada** com `Dockerfile` multi-stage otimizado.
+- Deploy contínuo via **Railway**, conectado à branch `develop`.
+- Banco de dados hospedado no **MongoDB Atlas**.
+
+---
+
+## 🚀 Como Rodar o Projeto Localmente
+
+### 🧭 1. Usando Docker (Recomendado)
+
+> O método mais rápido e confiável.  
+> Certifique-se de ter o **Docker Desktop** rodando.
 
 ```bash
-$ npm install
-```
+# 1. Clone o repositório
+git clone https://github.com/ericoliveirajs/backend-aluguel-carros.git
+cd backend-aluguel-carros
 
-## Compile and run the project
+# 2. Suba os contêineres (API + Banco de Dados)
+docker-compose up --build
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
+### 💻 2. Usando NPM (Ambiente Local)
 
 ```bash
-# unit tests
-$ npm run test
+# 1. Clone o repositório
+git clone https://github.com/ericoliveirajs/backend-aluguel-carros.git
+cd backend-aluguel-carros
 
-# e2e tests
-$ npm run test:e2e
+# 2. Instale as dependências
+npm install
 
-# test coverage
-$ npm run test:cov
-```
+Garanta que há uma instância do MongoDB rodando localmente
+(ou utilize sua string do MongoDB Atlas).
 
-## Deployment
+Crie o arquivo .env na raiz do projeto e adicione:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+MONGO_URI=<sua-string-de-conexao>
+JWT_SECRET=<sua-chave-secreta>
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Rode o servidor:
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+npm run start:dev
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+A API estará disponível em:
+👉 http://localhost:3000

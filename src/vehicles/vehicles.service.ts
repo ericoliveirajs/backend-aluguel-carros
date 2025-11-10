@@ -1,26 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
+import { Vehicle, VehicleDocument, VehicleStatus } from './schemas/vehicle.schema';
 
 @Injectable()
 export class VehiclesService {
-  create(createVehicleDto: CreateVehicleDto) {
-    return 'This action adds a new vehicle';
+  constructor(
+    @InjectModel(Vehicle.name) private vehicleModel: Model<VehicleDocument>,
+  ) {}
+
+  async create(createVehicleDto: CreateVehicleDto): Promise<VehicleDocument> {
+    const createdVehicle = new this.vehicleModel(createVehicleDto);
+    return createdVehicle.save();
   }
 
-  findAll() {
-    return `This action returns all vehicles`;
+  async findAll(): Promise<VehicleDocument[]> {
+    return this.vehicleModel.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} vehicle`;
+  async findById(id: string): Promise<VehicleDocument | null> {
+    return this.vehicleModel.findById(id).exec();
   }
 
-  update(id: number, updateVehicleDto: UpdateVehicleDto) {
-    return `This action updates a #${id} vehicle`;
+  async updateStatus(
+    id: string,
+    status: string,
+  ): Promise<VehicleDocument | null> {
+    return this.vehicleModel
+      .findByIdAndUpdate(id, { status: status }, { new: true })
+      .exec();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} vehicle`;
+  async update(
+    id: string,
+    updateVehicleDto: UpdateVehicleDto,
+  ): Promise<VehicleDocument | null> {
+    return this.vehicleModel
+      .findByIdAndUpdate(id, updateVehicleDto, { new: true })
+      .exec();
+  }
+
+  async remove(id: string) {
+    const vehicle = await this.findById(id);
+
+    if (vehicle?.status === VehicleStatus.RESERVADO) {
+      throw new ConflictException(
+        'Não é possível deletar um veículo que está reservado.',
+      );
+    }
+
+    return this.vehicleModel.findByIdAndDelete(id).exec();
   }
 }

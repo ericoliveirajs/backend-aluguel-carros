@@ -1,26 +1,85 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import {
+  Reservation,
+  ReservationDocument,
+} from './schemas/reservation.schema';
 import { CreateReservationDto } from './dto/create-reservation.dto';
-import { UpdateReservationDto } from './dto/update-reservation.dto';
+import { VehiclesService } from '../vehicles/vehicles.service';
+import { VehicleStatus } from '../vehicles/schemas/vehicle.schema';
 
 @Injectable()
 export class ReservationsService {
-  create(createReservationDto: CreateReservationDto) {
-    return 'This action adds a new reservation';
+  constructor(
+    @InjectModel(Reservation.name)
+    private reservationModel: Model<ReservationDocument>,
+    private vehiclesService: VehiclesService,
+  ) {}
+
+  async create(
+    createReservationDto: CreateReservationDto,
+    userId: string,
+  ) {
+    const { vehicleId } = createReservationDto;
+
+    const existingReservationForUser = await this.reservationModel
+      .findOne({ userId: new Types.ObjectId(userId) })
+      .exec();
+
+    if (existingReservationForUser) {
+      throw new ConflictException(
+        'Você já possui uma reserva ativa. Não é possível reservar mais de um veículo.',
+      );
+    }
+
+    const vehicle = await this.vehiclesService.findById(vehicleId);
+
+    if (!vehicle) {
+      throw new NotFoundException('O veículo solicitado não foi encontrado.');
+    }
+
+    if (vehicle.status === VehicleStatus.RESERVADO) {
+      throw new ConflictException('Este veículo já está reservado.');
+    }
+
+    await this.vehiclesService.updateStatus(
+      vehicleId,
+      VehicleStatus.RESERVADO,
+    );
+
+    const createdReservation = new this.reservationModel({
+      userId: new Types.ObjectId(userId),
+      vehicleId: new Types.ObjectId(vehicleId),
+    });
+
+    return createdReservation.save();
+  }
+  async findForUser(userId: string): Promise<ReservationDocument | null> {
+    return this.reservationModel
+      .findOne({ userId: new Types.ObjectId(userId) })
+      .populate('vehicleId')
+      .exec();
   }
 
-  findAll() {
-    return `This action returns all reservations`;
-  }
+  async  cancelForUser (userId: string ) {
+    const reservation = await  this.reservationModel
+    .findOne ({userId: new Types.ObjectId(userId) })
+    .exec();
 
-  findOne(id: number) {
-    return `This action returns a #${id} reservation`;
-  }
+    if (!reservation) {
+      throw new NotFoundException('Você não possui uma reserva ativa para cancelar.')
+    }
 
-  update(id: number, updateReservationDto: UpdateReservationDto) {
-    return `This action updates a #${id} reservation`;
-  }
+    await this.vehiclesService.updateStatus(
+      reservation.vehicleId.toString(),
+      VehicleStatus.DISPONIVEL,
+    );
 
-  remove(id: number) {
-    return `This action removes a #${id} reservation`;
+    return this.reservationModel.deleteOne({ _id: reservation._id});
   }
 }

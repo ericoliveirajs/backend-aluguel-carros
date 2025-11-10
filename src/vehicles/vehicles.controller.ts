@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { VehiclesService } from './vehicles.service';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 
@@ -9,5 +9,10 @@ export class VehiclesController {
   @Post()
   create(@Body() createVehicleDto: CreateVehicleDto) {
     return this.vehiclesService.create(createVehicleDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.vehiclesService.findAll();
   }
 }

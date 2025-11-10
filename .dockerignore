@@ -1,0 +1,5 @@
+# Este arquivo impede que o Docker copie lixo para a imagem
+dist
+node_modules
+.git
+.env

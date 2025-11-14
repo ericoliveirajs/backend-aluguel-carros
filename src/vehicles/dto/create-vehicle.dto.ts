@@ -20,4 +20,8 @@ export class CreateVehicleDto {
   @IsInt()
   @IsNotEmpty()
   luggageCapacity: number;
+
+  @IsString()
+  @IsNotEmpty()
+  imageUrl: string;
 }

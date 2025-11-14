@@ -13,6 +13,8 @@ async function bootstrap() {
     profilesSampleRate: 1.0,
   });
 
+  app.enableCors();
+
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     forbidNonWhitelisted: true,

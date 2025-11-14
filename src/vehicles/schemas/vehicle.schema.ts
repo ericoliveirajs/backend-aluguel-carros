@@ -28,6 +28,9 @@ export class Vehicle {
 
   @Prop({ required: true, enum: VehicleStatus, default: VehicleStatus.DISPONIVEL })
   status: VehicleStatus;
+
+  @Prop({ required: true })
+  imageUrl: string;
 }
 
 export const VehicleSchema = SchemaFactory.createForClass(Vehicle);
